@@ -48,9 +48,6 @@ st.markdown("""
             color: white;
         }
 
-        /* Supaya teks di halaman deteksi berwarna hitam */
-        .stMarkdown, .stText, .stHeader, .stTitle, .stSubheader, .stCaption, .stWrite {
-            color: black !important;
         }
     </style>
 """, unsafe_allow_html=True)
