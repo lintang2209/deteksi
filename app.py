@@ -14,34 +14,6 @@ st.markdown("""
             background-color: #f9fafb;
         }
 
-        /* Daun kiri atas */
-        body::before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            left: -50px;
-            width: 250px;
-            height: 250px;
-            background: url("https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.piqsels.com%2Fid%2Fpublic-domain-photo-siimx&psig=AOvVaw3RhuCGbjSlLn9fGVkNReX6&ust=1755967082523000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMif0IDtno8DFQAAAAAdAAAAABAE") no-repeat;
-            background-size: contain;
-            transform: rotate(20deg);
-            z-index: -1;
-        }
-
-        /* Daun kanan bawah */
-        body::after {
-            content: "";
-            position: absolute;
-            bottom: -30px;
-            right: -50px;
-            width: 250px;
-            height: 250px;
-            background: url("https://i.ibb.co/Z2ShYDC/leaf-bottom.png") no-repeat;
-            background-size: contain;
-            transform: rotate(-15deg);
-            z-index: -1;
-        }
-
         .center {
             text-align: center;
             padding-top: 120px;
@@ -50,7 +22,7 @@ st.markdown("""
         .title {
             font-size: 36px;
             font-weight: 700;
-            color: #4b8b64;
+            color: #7d7d7d;
         }
 
         .subtitle {
@@ -69,6 +41,7 @@ st.markdown("""
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
+            position:center;
         }
         .stButton>button:hover {
             background-color: #4b8b64;
