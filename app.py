@@ -11,7 +11,7 @@ from ultralytics import YOLO
 st.markdown("""
     <style>
         .main {
-            background-color: #f9fafb;
+            background-color: green;
         }
 
         .center {
