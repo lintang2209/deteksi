@@ -4,83 +4,170 @@ from PIL import Image
 import os
 import tensorflow as tf
 from ultralytics import YOLO
+import gdown
 
-# ==== KONFIGURASI TEMA DAN BACKGROUND ====
-page_bg = """
-<style>
-.stApp {
-    background-color: #f0f8f5; /* Warna hijau muda */
-}
-</style>
-"""
-st.markdown(page_bg, unsafe_allow_html=True)
+# ====================
+# CSS Styling dengan URL daun online
+# ====================
+st.markdown("""
+    <style>
+        .main {
+            background-color: #f6fdf9; /* hijau muda lembut */
+        }
 
-# ==== UI ====
-st.title("🌱 Deteksi Penyakit Soybean Rust (CNN vs YOLO)")
-st.write("Unggah satu gambar daun kedelai, lalu tekan tombol **Cek Tanamanmu** untuk melihat hasil deteksi dari kedua model.")
+        /* Posisi daun kiri atas */
+        .leaf-top {
+            position: fixed;
+            top: -30px;
+            left: -50px;
+            width: 220px;
+            opacity: 0.9;
+            z-index: -1;
+        }
 
-# ==== LOAD MODEL DENGAN CACHING ====
-@st.cache_resource
-def load_cnn_model():
-    MODEL_PATH = "models/cnn_soybean_rust_new.h5"
-    if not os.path.exists(MODEL_PATH):
-        st.error(f"File model CNN tidak ditemukan: {MODEL_PATH}")
-        return None
-    try:
-        model = tf.keras.models.load_model(MODEL_PATH)
-        return model
-    except Exception as e:
-        st.error(f"Gagal memuat model CNN: {e}")
-        return None
+        /* Posisi daun kanan bawah */
+        .leaf-bottom {
+            position: fixed;
+            bottom: -30px;
+            right: -50px;
+            width: 220px;
+            opacity: 0.9;
+            z-index: -1;
+        }
 
-@st.cache_resource
-def load_yolo_model():
-    MODEL_PATH = "models/best.pt"
-    if not os.path.exists(MODEL_PATH):
-        st.error(f"File model YOLOv8 tidak ditemukan: {MODEL_PATH}")
-        return None
-    try:
-        model = YOLO(MODEL_PATH)
-        return model
-    except Exception as e:
-        st.error(f"Gagal memuat model YOLOv8: {e}")
-        return None
+        .center {
+            text-align: center;
+            padding-top: 120px;
+        }
 
-# Muat kedua model
-cnn_model = load_cnn_model()
-yolo_model = load_yolo_model()
+        .title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #4b8b64;
+        }
 
-# Jika gagal load model, hentikan aplikasi
-if cnn_model is None or yolo_model is None:
-    st.stop()
+        .subtitle {
+            font-size: 16px;
+            font-style: italic;
+            color: #7d7d7d;
+            margin-top: -10px;
+        }
 
-# ==== UPLOAD FILE ====
-uploaded_file = st.file_uploader("📂 Pilih gambar daun...", type=["jpg", "png", "jpeg"])
+        .stButton>button {
+            background-color: #f0f0f0;
+            color: #4b8b64;
+            border-radius: 20px;
+            border: none;
+            padding: 10px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .stButton>button:hover {
+            background-color: #4b8b64;
+            color: white;
+        }
+    </style>
 
-# Tombol cek tanaman
-if uploaded_file is not None:
-    if st.button("🔍 Cek Tanamanmu"):
+    <!-- Tambahin gambar daun manual -->
+    <img src="https://i.ibb.co/Lh2W1tV/leaf-top.png" class="leaf-top"/>
+    <img src="https://i.ibb.co/Z2ShYDC/leaf-bottom.png" class="leaf-bottom"/>
+""", unsafe_allow_html=True)
+
+# ====================
+# Navigasi sederhana
+# ====================
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+if st.session_state.page == "home":
+    # Landing page
+    st.markdown("""
+    <div class="center">
+        <p class="title">ayo cek tanamanmu!</p>
+        <p class="subtitle">kenali soybean rust sejak dini<br>untuk hasil panen yang lebih baik</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("cek disini"):
+        st.session_state.page = "deteksi"
+        st.rerun()
+
+# ====================
+# Halaman Deteksi (CNN & YOLO)
+# ====================
+elif st.session_state.page == "deteksi":
+
+    st.title("Perbandingan Deteksi Penyakit Soybean Rust (CNN vs YOLO) 🌱")
+    st.write("Unggah satu gambar daun kedelai untuk melihat hasil deteksi dari kedua model secara bersamaan.")
+
+    @st.cache_resource
+    def load_cnn_model():
+        # --- Unduh model dari Google Drive ---
+        GOOGLE_DRIVE_FILE_ID = "1sZegfJRnGu2tr00qtinTAeZeLaQnllrO" # Link sudah disesuaikan
+        MODEL_PATH = "models/cnn.h5"
+        
+        # Periksa apakah folder "models" ada, jika tidak, buatlah
+        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+
+        if not os.path.exists(MODEL_PATH):
+            st.info("Mengunduh model dari Google Drive...")
+            try:
+                gdown.download(f'https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}', MODEL_PATH, quiet=False)
+                st.success("Model berhasil diunduh!")
+            except Exception as e:
+                st.error(f"Gagal mengunduh model dari Google Drive: {e}")
+                return None
+
+        # --- Muat model ---
+        try:
+            model = tf.keras.models.load_model(MODEL_PATH)
+            return model
+        except Exception as e:
+            st.error(f"Gagal memuat model CNN: {e}")
+            return None
+
+    @st.cache_resource
+    def load_yolo_model():
+        MODEL_PATH = "models/best.pt"
+        if not os.path.exists(MODEL_PATH):
+            st.error(f"File model YOLOv8 tidak ditemukan: {MODEL_PATH}")
+            return None
+        try:
+            model = YOLO(MODEL_PATH)
+            return model
+        except Exception as e:
+            st.error(f"Gagal memuat model YOLOv8: {e}")
+            return None
+
+    # Muat model
+    cnn_model = load_cnn_model()
+    yolo_model = load_yolo_model()
+
+    if cnn_model is None or yolo_model is None:
+        st.stop()
+
+    uploaded_file = st.file_uploader("Pilih gambar daun...", type=["jpg", "png", "jpeg"])
+
+    if uploaded_file is not None:
         image = Image.open(uploaded_file).convert("RGB")
         st.image(image, caption="Gambar yang diunggah", use_column_width=True)
         st.write("---")
 
-        # Kolom untuk perbandingan hasil
         col1, col2 = st.columns(2)
 
-        # ==== HASIL DETEKSI CNN ====
+        # ==== CNN ====
         with col1:
             st.header("Hasil Analisis CNN")
             try:
-                # Preprocessing sesuai arsitektur CNN
                 img_resized = image.resize((224, 224))
                 img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0)
 
-                # Prediksi
                 prediction = cnn_model.predict(img_array)
                 class_id = np.argmax(prediction)
                 confidence = np.max(prediction)
-
-                class_names = ["Daun Sehat", "Soybean Rust"]
+                
+                class_names = ["sehat", "Soybean Rust"]
                 predicted_class_name = class_names[class_id]
 
                 st.write(f"### Prediksi: **{predicted_class_name}**")
@@ -88,16 +175,14 @@ if uploaded_file is not None:
             except Exception as e:
                 st.error(f"Terjadi kesalahan pada model CNN: {e}")
 
-        # ==== HASIL DETEKSI YOLOv8 ====
+        # ==== YOLOv8 ====
         with col2:
             st.header("Hasil Analisis YOLOv8")
             try:
-                # Jalankan deteksi
                 results = yolo_model(image)
                 results_img = results[0].plot()
                 st.image(results_img, caption="Hasil Deteksi YOLOv8", use_column_width=True)
 
-                # Tampilkan info deteksi
                 if len(results[0].boxes) > 0:
                     st.write("#### Detail Deteksi:")
                     for box in results[0].boxes:
@@ -107,3 +192,7 @@ if uploaded_file is not None:
                     st.write("Tidak ditemukan penyakit Soybean Rust.")
             except Exception as e:
                 st.error(f"Terjadi kesalahan pada model YOLOv8: {e}")
+
+    if st.button("⬅️ Kembali ke Beranda"):
+        st.session_state.page = "home"
+        st.rerun()
