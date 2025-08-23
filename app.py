@@ -76,13 +76,6 @@ st.markdown("""
             color: white;
         }
 
-        /* CSS baru untuk memusatkan tombol */
-        .center-button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
     </style>
 """, unsafe_allow_html=True)
 
@@ -101,12 +94,12 @@ if st.session_state.page == "home":
     </div>
     """, unsafe_allow_html=True)
 
-    # Bungkus tombol dengan container dan CSS
-    st.markdown('<div class="center-button">', unsafe_allow_html=True)
-    if st.button("cek disini"):
-        st.session_state.page = "deteksi"
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+    # --- Gunakan kolom untuk memusatkan tombol ---
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2: # Letakkan tombol di kolom tengah
+        if st.button("cek disini"):
+            st.session_state.page = "deteksi"
+            st.rerun()
 
 
 # ====================
