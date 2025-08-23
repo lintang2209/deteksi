@@ -57,6 +57,16 @@ st.markdown("""
             margin-top: -5px;
         }
 
+        /* Input uploader */
+        .uploadedFile {
+            color: #2E3A59 !important;  /* teks uploader jadi gelap */
+            font-weight: 500 !important;
+        }
+        .stFileUploader label {
+            color: #2E3A59 !important;  /* label file uploader lebih gelap */
+            font-weight: 600 !important;
+        }
+
         /* Button */
         .stButton>button {
             background-color: #66BB6A;
@@ -91,10 +101,10 @@ st.markdown("""
         }
         .accuracy {
             font-size: 14px;
-            color: #555555;
+            color: #2E3A59; /* ganti dari abu ke gelap */
         }
     </style>
-""", unsafe_allow_html=True)
+""", unsafe_allow_html=True
 
 # ====================
 # Navigasi sederhana
