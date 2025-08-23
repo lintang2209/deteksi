@@ -108,7 +108,7 @@ elif st.session_state.page == "deteksi":
     @st.cache_resource
     def load_cnn_model():
         # --- Unduh model dari Google Drive ---
-        GOOGLE_DRIVE_FILE_ID = "1b_FSjLnr66yv9WjEz9Sxo6ztr7QW1kvz" # Link sudah disesuaikan
+        GOOGLE_DRIVE_FILE_ID = "1EyuK-NIZwLHgJll2E9ZfKFtXM6m-VoOO" # Link sudah disesuaikan
         MODEL_PATH = "models/cnn_soybean_rust.h5"
         
         # Periksa apakah folder "models" ada, jika tidak, buatlah
