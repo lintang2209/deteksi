@@ -48,6 +48,7 @@ st.markdown("""
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
+            position: center;
         }
         .stButton>button:hover {
             background-color: #4b8b64;
