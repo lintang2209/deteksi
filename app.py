@@ -7,41 +7,76 @@ from ultralytics import YOLO
 import gdown
 
 # ====================
-# CSS Styling
+# CSS Styling dengan URL daun online
 # ====================
 st.markdown("""
     <style>
-        body {
-            background-color: #f8faf8;
+        .main {
+            background-color: #f9fafb;
         }
-        .upload-box {
-            background-color: #f0f7f2;
-            padding: 30px;
-            border-radius: 12px;
+
+        /* Daun kiri atas */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            left: -50px;
+            width: 250px;
+            height: 250px;
+            background: url("https://i.ibb.co/Lh2W1tV/leaf-top.png") no-repeat;
+            background-size: contain;
+            transform: rotate(20deg);
+            z-index: -1;
+        }
+
+        /* Daun kanan bawah */
+        body::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            right: -50px;
+            width: 250px;
+            height: 250px;
+            background: url("https://i.ibb.co/Z2ShYDC/leaf-bottom.png") no-repeat;
+            background-size: contain;
+            transform: rotate(-15deg);
+            z-index: -1;
+        }
+
+        .center {
             text-align: center;
+            padding-top: 120px;
         }
-        .card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .card h4 {
+
+        .title {
+            font-size: 36px;
+            font-weight: 700;
             color: #4b8b64;
-            margin-bottom: 10px;
         }
-        .detected {
-            color: red;
-            font-weight: bold;
+
+        .subtitle {
+            font-size: 16px;
+            font-style: italic;
+            color: #7d7d7d;
+            margin-top: -10px;
         }
-        .healthy {
-            color: green;
-            font-weight: bold;
+
+        .stButton>button {
+            background-color: #f0f0f0;
+            color: #4b8b64;
+            border-radius: 20px;
+            border: none;
+            padding: 10px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .stButton>button:hover {
+            background-color: #4b8b64;
+            color: white;
         }
     </style>
 """, unsafe_allow_html=True)
-
 
 # ====================
 # Navigasi sederhana
@@ -52,11 +87,9 @@ if "page" not in st.session_state:
 if st.session_state.page == "home":
     # Landing page
     st.markdown("""
-    <div style="text-align:center; padding-top:120px;">
-        <p style="font-size:36px; font-weight:700; color:#4b8b64;">ayo cek tanamanmu!</p>
-        <p style="font-size:16px; font-style:italic; color:#7d7d7d;">
-            kenali soybean rust sejak dini<br>untuk hasil panen yang lebih baik
-        </p>
+    <div class="center">
+        <p class="title">ayo cek tanamanmu!</p>
+        <p class="subtitle">kenali soybean rust sejak dini<br>untuk hasil panen yang lebih baik</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -64,106 +97,105 @@ if st.session_state.page == "home":
         st.session_state.page = "deteksi"
         st.rerun()
 
-
 # ====================
-# Halaman Deteksi
+# Halaman Deteksi (CNN & YOLO)
 # ====================
 elif st.session_state.page == "deteksi":
 
-    st.markdown("<h2 style='color:#4b8b64;'>Deteksi Penyakit Daun Soybean 🌱</h2>", unsafe_allow_html=True)
-    st.write("Unggah gambar daun kedelai untuk melihat hasil deteksi dari model CNN dan YOLO.")
+    st.title("Perbandingan Deteksi Penyakit Soybean Rust (CNN vs YOLO) 🌱")
+    st.write("Unggah satu gambar daun kedelai untuk melihat hasil deteksi dari kedua model secara bersamaan.")
 
-    # Fungsi muat model CNN
     @st.cache_resource
     def load_cnn_model():
-        GOOGLE_DRIVE_FILE_ID = "1JeSvrid8Zw2xurG-pciDrw6EdI2qXuAd"
-        MODEL_PATH = "models/cnn.h5"
+        # --- Unduh model dari Google Drive ---
+        GOOGLE_DRIVE_FILE_ID = "1b_FSjLnr66yv9WjEz9Sxo6ztr7QW1kvz" # Link sudah disesuaikan
+        MODEL_PATH = "models/cnn_soybean_rust.h5"
+        
+        # Periksa apakah folder "models" ada, jika tidak, buatlah
         os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+
         if not os.path.exists(MODEL_PATH):
-            st.info("Mengunduh model CNN dari Google Drive...")
+            st.info("Mengunduh model dari Google Drive...")
             try:
                 gdown.download(f'https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}', MODEL_PATH, quiet=False)
                 st.success("Model berhasil diunduh!")
             except Exception as e:
-                st.error(f"Gagal mengunduh model CNN: {e}")
+                st.error(f"Gagal mengunduh model dari Google Drive: {e}")
                 return None
+
+        # --- Muat model ---
         try:
-            return tf.keras.models.load_model(MODEL_PATH)
+            model = tf.keras.models.load_model(MODEL_PATH)
+            return model
         except Exception as e:
             st.error(f"Gagal memuat model CNN: {e}")
             return None
 
-    # Fungsi muat model YOLO
     @st.cache_resource
     def load_yolo_model():
         MODEL_PATH = "models/best.pt"
         if not os.path.exists(MODEL_PATH):
-            st.error("File model YOLOv8 tidak ditemukan.")
+            st.error(f"File model YOLOv8 tidak ditemukan: {MODEL_PATH}")
             return None
         try:
-            return YOLO(MODEL_PATH)
+            model = YOLO(MODEL_PATH)
+            return model
         except Exception as e:
             st.error(f"Gagal memuat model YOLOv8: {e}")
             return None
 
+    # Muat model
     cnn_model = load_cnn_model()
     yolo_model = load_yolo_model()
+
     if cnn_model is None or yolo_model is None:
         st.stop()
 
-    # Layout 2 kolom
-    col1, col2 = st.columns([1,2])
+    uploaded_file = st.file_uploader("Pilih gambar daun...", type=["jpg", "png", "jpeg"])
 
-    with col1:
-        st.markdown("<div class='upload-box'><h3>Upload Disini!</h3>", unsafe_allow_html=True)
-        uploaded_file = st.file_uploader("Pilih gambar daun...", type=["jpg","png","jpeg"])
-        st.markdown("</div>", unsafe_allow_html=True)
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file).convert("RGB")
+        st.image(image, caption="Gambar yang diunggah", use_column_width=True)
+        st.write("---")
 
-    with col2:
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file).convert("RGB")
+        col1, col2 = st.columns(2)
 
-            # Card CNN
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.subheader("Hasil Deteksi Grad-CAM CNN")
-            st.image(image, caption="Gambar Asli", use_column_width=True)
-
+        # ==== CNN ====
+        with col1:
+            st.header("Hasil Analisis CNN")
             try:
                 img_resized = image.resize((224, 224))
                 img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0)
+
                 prediction = cnn_model.predict(img_array)
                 class_id = np.argmax(prediction)
                 confidence = np.max(prediction)
+                
                 class_names = ["Daun Sehat", "Soybean Rust"]
-                predicted_class = class_names[class_id]
+                predicted_class_name = class_names[class_id]
 
-                if predicted_class == "Soybean Rust":
-                    st.markdown(f"<p class='detected'>Terinfeksi</p>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"<p class='healthy'>Sehat</p>", unsafe_allow_html=True)
-                st.write(f"Accuracy: {confidence*100:.2f}%")
+                st.write(f"### Prediksi: **{predicted_class_name}**")
+                st.write(f"Confidence: **{confidence:.2f}**")
             except Exception as e:
-                st.error(f"Error CNN: {e}")
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.error(f"Terjadi kesalahan pada model CNN: {e}")
 
-            # Card YOLO
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.subheader("Hasil Deteksi Bounding Box YOLO")
+        # ==== YOLOv8 ====
+        with col2:
+            st.header("Hasil Analisis YOLOv8")
             try:
                 results = yolo_model(image)
                 results_img = results[0].plot()
-                st.image(results_img, caption="Deteksi YOLOv8", use_column_width=True)
+                st.image(results_img, caption="Hasil Deteksi YOLOv8", use_column_width=True)
 
                 if len(results[0].boxes) > 0:
-                    st.markdown(f"<p class='detected'>Terinfeksi</p>", unsafe_allow_html=True)
+                    st.write("#### Detail Deteksi:")
                     for box in results[0].boxes:
                         conf = float(box.conf[0])
-                        st.write(f"Confidence: {conf*100:.2f}%")
+                        st.write(f"- Ditemukan **Penyakit Soybean Rust** dengan confidence **{conf:.2f}**")
                 else:
-                    st.markdown(f"<p class='healthy'>Sehat</p>", unsafe_allow_html=True)
+                    st.write("Tidak ditemukan penyakit Soybean Rust.")
             except Exception as e:
-                st.error(f"Error YOLO: {e}")
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.error(f"Terjadi kesalahan pada model YOLOv8: {e}")
 
     if st.button("⬅️ Kembali ke Beranda"):
         st.session_state.page = "home"
