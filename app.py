@@ -12,7 +12,7 @@ import gdown
 st.markdown("""
     <style>
         .main {
-            background-color: #f9fafb;
+            background-color: #6666;
         }
 
         /* Daun kiri atas */
