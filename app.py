@@ -7,76 +7,85 @@ from ultralytics import YOLO
 import gdown
 
 # ====================
-# CSS Styling dengan URL daun online
+# CSS Styling untuk UI
 # ====================
 st.markdown("""
     <style>
-        .main {
-            background-color: #6666;
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-
-        /* Daun kiri atas */
-        body::before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            left: -50px;
-            width: 250px;
-            height: 250px;
-            background: url("https://i.ibb.co/Lh2W1tV/leaf-top.png") no-repeat;
-            background-size: contain;
-            transform: rotate(20deg);
-            z-index: -1;
-        }
-
-        /* Daun kanan bawah */
-        body::after {
-            content: "";
-            position: absolute;
-            bottom: -30px;
-            right: -50px;
-            width: 250px;
-            height: 250px;
-            background: url("https://i.ibb.co/Z2ShYDC/leaf-bottom.png") no-repeat;
-            background-size: contain;
-            transform: rotate(-15deg);
-            z-index: -1;
-        }
-
-        .center {
-            text-align: center;
-            padding-top: 120px;
-        }
-
-        .title {
-            font-size: 36px;
+        .navbar-left {
             font-weight: 700;
             color: #4b8b64;
+            font-size: 20px;
         }
-
-        .subtitle {
-            font-size: 16px;
-            font-style: italic;
-            color: #7d7d7d;
-            margin-top: -10px;
-        }
-
-        .stButton>button {
-            background-color: #f0f0f0;
+        .navbar-right a {
+            margin-left: 25px;
+            text-decoration: none;
             color: #4b8b64;
-            border-radius: 20px;
-            border: none;
-            padding: 10px 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+            font-weight: 500;
         }
-        .stButton>button:hover {
-            background-color: #4b8b64;
-            color: white;
+        .navbar-right a:hover {
+            color: #2d5c3c;
+        }
+
+        /* Upload Box */
+        .upload-box {
+            background-color: #f0f7f2;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .upload-box h3 {
+            color: #4b8b64;
+        }
+
+        /* Card hasil */
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card h4 {
+            color: #4b8b64;
+            margin-bottom: 10px;
+        }
+        .detected {
+            color: red;
+            font-weight: bold;
+        }
+        .healthy {
+            color: green;
+            font-weight: bold;
         }
     </style>
 """, unsafe_allow_html=True)
+
+# ====================
+# Navbar
+# ====================
+st.markdown("""
+<div class="navbar">
+    <div class="navbar-left">🌱 SoybeanCare</div>
+    <div class="navbar-right">
+        <a href="#">Dashboard</a>
+        <a href="#">Deteksi Penyakit</a>
+        <a href="#">Evaluasi</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 
 # ====================
 # Navigasi sederhana
@@ -85,11 +94,12 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 if st.session_state.page == "home":
-    # Landing page
     st.markdown("""
-    <div class="center">
-        <p class="title">ayo cek tanamanmu!</p>
-        <p class="subtitle">kenali soybean rust sejak dini<br>untuk hasil panen yang lebih baik</p>
+    <div style="text-align:center; padding-top:100px;">
+        <p style="font-size:36px; font-weight:700; color:#4b8b64;">ayo cek tanamanmu!</p>
+        <p style="font-size:16px; font-style:italic; color:#7d7d7d;">
+            kenali soybean rust sejak dini<br>untuk hasil panen yang lebih baik
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -98,71 +108,51 @@ if st.session_state.page == "home":
         st.rerun()
 
 # ====================
-# Halaman Deteksi (CNN & YOLO)
+# Halaman Deteksi
 # ====================
 elif st.session_state.page == "deteksi":
+    st.markdown("<h2 style='color:#4b8b64;'>Deteksi Penyakit Daun Soybean 🌱</h2>", unsafe_allow_html=True)
 
-    st.title("Perbandingan Deteksi Penyakit Soybean Rust (CNN vs YOLO) 🌱")
-    st.write("Unggah satu gambar daun kedelai untuk melihat hasil deteksi dari kedua model secara bersamaan.")
-
+    # Load CNN Model
     @st.cache_resource
     def load_cnn_model():
-        # --- Unduh model dari Google Drive ---
-        GOOGLE_DRIVE_FILE_ID = "1sZegfJRnGu2tr00qtinTAeZeLaQnllrO" # Link sudah disesuaikan
+        GOOGLE_DRIVE_FILE_ID = "1sZegfJRnGu2tr00qtinTAeZeLaQnllrO"
         MODEL_PATH = "models/cnn.h5"
-        
-        # Periksa apakah folder "models" ada, jika tidak, buatlah
         os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 
         if not os.path.exists(MODEL_PATH):
-            st.info("Mengunduh model dari Google Drive...")
-            try:
-                gdown.download(f'https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}', MODEL_PATH, quiet=False)
-                st.success("Model berhasil diunduh!")
-            except Exception as e:
-                st.error(f"Gagal mengunduh model dari Google Drive: {e}")
-                return None
+            st.info("Mengunduh model CNN...")
+            gdown.download(f'https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}', MODEL_PATH, quiet=False)
+        return tf.keras.models.load_model(MODEL_PATH)
 
-        # --- Muat model ---
-        try:
-            model = tf.keras.models.load_model(MODEL_PATH)
-            return model
-        except Exception as e:
-            st.error(f"Gagal memuat model CNN: {e}")
-            return None
-
+    # Load YOLO Model
     @st.cache_resource
     def load_yolo_model():
         MODEL_PATH = "models/best.pt"
         if not os.path.exists(MODEL_PATH):
-            st.error(f"File model YOLOv8 tidak ditemukan: {MODEL_PATH}")
+            st.error("File model YOLOv8 tidak ditemukan.")
             return None
-        try:
-            model = YOLO(MODEL_PATH)
-            return model
-        except Exception as e:
-            st.error(f"Gagal memuat model YOLOv8: {e}")
-            return None
+        return YOLO(MODEL_PATH)
 
-    # Muat model
     cnn_model = load_cnn_model()
     yolo_model = load_yolo_model()
-
     if cnn_model is None or yolo_model is None:
         st.stop()
 
-    uploaded_file = st.file_uploader("Pilih gambar daun...", type=["jpg", "png", "jpeg"])
+    # Layout dua kolom
+    col1, col2 = st.columns([1,2])
 
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("RGB")
-        st.image(image, caption="Gambar yang diunggah", use_column_width=True)
-        st.write("---")
+    with col1:
+        st.markdown("<div class='upload-box'><h3>Upload Disini!</h3></div>", unsafe_allow_html=True)
+        uploaded_file = st.file_uploader("Pilih gambar daun...", type=["jpg","png","jpeg"])
 
-        col1, col2 = st.columns(2)
+    with col2:
+        if uploaded_file is not None:
+            image = Image.open(uploaded_file).convert("RGB")
 
-        # ==== CNN ====
-        with col1:
-            st.header("Hasil Analisis CNN")
+            # ==== Card CNN ====
+            st.markdown("<div class='card'>", unsafe_allow_html=True)
+            st.subheader("Hasil Deteksi Grad-CAM CNN")
             try:
                 img_resized = image.resize((224, 224))
                 img_array = np.expand_dims(np.array(img_resized) / 255.0, axis=0)
@@ -170,32 +160,37 @@ elif st.session_state.page == "deteksi":
                 prediction = cnn_model.predict(img_array)
                 class_id = np.argmax(prediction)
                 confidence = np.max(prediction)
-                
-                class_names = ["sehat", "Soybean Rust"]
-                predicted_class_name = class_names[class_id]
+                class_names = ["Daun Sehat", "Soybean Rust"]
+                predicted_class = class_names[class_id]
 
-                st.write(f"### Prediksi: **{predicted_class_name}**")
-                st.write(f"Confidence: **{confidence:.2f}**")
+                st.image(image, caption="Gambar Asli", use_column_width=True)
+                if predicted_class == "Soybean Rust":
+                    st.markdown("<p class='detected'>Terinfeksi</p>", unsafe_allow_html=True)
+                else:
+                    st.markdown("<p class='healthy'>Sehat</p>", unsafe_allow_html=True)
+                st.write(f"Accuracy: {confidence*100:.2f}%")
             except Exception as e:
-                st.error(f"Terjadi kesalahan pada model CNN: {e}")
+                st.error(f"Error CNN: {e}")
+            st.markdown("</div>", unsafe_allow_html=True)
 
-        # ==== YOLOv8 ====
-        with col2:
-            st.header("Hasil Analisis YOLOv8")
+            # ==== Card YOLO ====
+            st.markdown("<div class='card'>", unsafe_allow_html=True)
+            st.subheader("Hasil Deteksi Bounding Box YOLO")
             try:
                 results = yolo_model(image)
                 results_img = results[0].plot()
-                st.image(results_img, caption="Hasil Deteksi YOLOv8", use_column_width=True)
+                st.image(results_img, caption="Deteksi YOLOv8", use_column_width=True)
 
                 if len(results[0].boxes) > 0:
-                    st.write("#### Detail Deteksi:")
+                    st.markdown("<p class='detected'>Terinfeksi</p>", unsafe_allow_html=True)
                     for box in results[0].boxes:
                         conf = float(box.conf[0])
-                        st.write(f"- Ditemukan **Penyakit Soybean Rust** dengan confidence **{conf:.2f}**")
+                        st.write(f"Confidence: {conf*100:.2f}%")
                 else:
-                    st.write("Tidak ditemukan penyakit Soybean Rust.")
+                    st.markdown("<p class='healthy'>Sehat</p>", unsafe_allow_html=True)
             except Exception as e:
-                st.error(f"Terjadi kesalahan pada model YOLOv8: {e}")
+                st.error(f"Error YOLO: {e}")
+            st.markdown("</div>", unsafe_allow_html=True)
 
     if st.button("⬅️ Kembali ke Beranda"):
         st.session_state.page = "home"
