@@ -12,7 +12,7 @@ import gdown
 st.markdown("""
     <style>
         .main {
-            background-color: white;
+            background-color: #6666;
         }
 
         /* Daun kiri atas */
@@ -76,6 +76,12 @@ st.markdown("""
             color: white;
         }
 
+        /* CSS baru untuk memusatkan tombol secara presisi */
+        div.stButton {
+            display: flex;
+            justify-content: center;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -94,13 +100,10 @@ if st.session_state.page == "home":
     </div>
     """, unsafe_allow_html=True)
 
-    # --- Gunakan kolom untuk memusatkan tombol ---
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2: # Letakkan tombol di kolom tengah
-        if st.button("cek disini"):
-            st.session_state.page = "deteksi"
-            st.rerun()
-
+    # Tombol akan otomatis berada di tengah berkat CSS di atas
+    if st.button("cek disini"):
+        st.session_state.page = "deteksi"
+        st.rerun()
 
 # ====================
 # Halaman Deteksi (CNN & YOLO)
