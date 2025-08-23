@@ -14,6 +14,7 @@ st.markdown("""
         /* Atur background halaman */
         .main {
             background-color: #f9fdf9;
+            color: #333333; /* Default warna teks biar tidak putih */
         }
 
         /* Center konten di landing page */
@@ -32,7 +33,7 @@ st.markdown("""
         .subtitle {
             font-size: 18px;
             font-style: italic;
-            color: #7d7d7d;
+            color: #555555;
             margin-top: -10px;
         }
 
@@ -58,6 +59,7 @@ st.markdown("""
             padding: 30px;
             border-radius: 15px;
             text-align: center;
+            color: #333333;
         }
 
         /* Card hasil deteksi */
@@ -67,6 +69,7 @@ st.markdown("""
             padding: 20px;
             box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            color: #333333; /* pastikan teks dalam card tidak putih */
         }
         .result-title {
             font-weight: bold;
