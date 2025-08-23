@@ -79,7 +79,7 @@ elif st.session_state.page == "deteksi":
     # ===== Load CNN model =====
     @st.cache_resource
     def load_cnn_model():
-        MODEL_PATH = "models/cnn_soybean_rust.h5"
+        #MODEL_PATH = "models/cnn_soybean_rust.h5"
         DRIVE_URL = "https://drive.google.com/file/d/1JeSvrid8Zw2xurG-pciDrw6EdI2qXuAd/view?usp=sharing"  
 
         if not os.path.exists(MODEL_PATH):
