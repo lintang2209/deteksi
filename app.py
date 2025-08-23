@@ -35,43 +35,7 @@ st.markdown("""
             background-color: #F2FBF1;
         }
         
-        /* Styling untuk logo dan navigasi di header */
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 40px;
-            background-color: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-            color: #4b8b64;
-        }
-        
-        .logo-text {
-            margin-left: 10px;
-            font-size: 20px;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            font-size: 14px;
-        }
-        
-        .nav-links a {
-            color: #555555;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: #4b8b64;
-        }
+        /* Styling untuk logo dan navigasi di header - Dihapus karena navbar dihapus */
 
         /* Center konten di landing page */
         .center {
@@ -100,17 +64,17 @@ st.markdown("""
 
         /* Styling tombol */
         .stButton>button {
-            background-color: white;
+            background-color: #f0f0f0;
             color: #4b8b64;
             border-radius: 25px;
-            border: 1px solid #4b8b64;
+            border: none;
             padding: 10px 30px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
             position: center;
-            margin-top: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px; /* Jarak dari subtitle */
         }
         .stButton>button:hover {
             background-color: #4b8b64;
@@ -139,9 +103,9 @@ st.markdown("""
 
         /* Styling tombol browse/upload */
         .st-emotion-cache-1c0y53j, .st-emotion-cache-1c0y53j > div > button {
-            background-color: white !important;
+            background-color: #f0f0f0 !important;
             color: #4b8b64 !important;
-            border: 1px solid #4b8b64 !important;
+            border: none !important;
             border-radius: 10px !important;
             padding: 8px 20px !important;
             font-weight: 600 !important;
@@ -149,6 +113,17 @@ st.markdown("""
             transition: 0.3s !important;
         }
         .st-emotion-cache-1c0y53j > div > button:hover {
+            background-color: #4b8b64 !important;
+            color: white !important;
+        }
+        
+        .st-emotion-cache-1c0y53j > div > button:first-child {
+            /* Styling khusus untuk tombol "Browse file" */
+            border: 1px solid #4b8b64 !important;
+            background-color: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        }
+        .st-emotion-cache-1c0y53j > div > button:first-child:hover {
             background-color: #4b8b64 !important;
             color: white !important;
         }
@@ -209,21 +184,11 @@ st.markdown("""
 
 
 # ====================
-# Header Navigasi
+# Header Navigasi - Dihapus
 # ====================
 def show_header():
-    st.markdown("""
-        <div class="header-section">
-            <div class="logo">
-                🌱 <span class="logo-text">SoybeanCare</span>
-            </div>
-            <div class="nav-links">
-                <a href="#" onclick="window.location.reload();">Dashboard</a>
-                <a href="#" onclick="window.location.reload();">Deteksi Penyakit</a>
-                <a href="#" onclick="window.location.reload();">Evaluasi</a>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    # Fungsi ini tidak lagi digunakan
+    pass
 
 # ====================
 # Navigasi sederhana
@@ -238,16 +203,9 @@ if st.session_state.page == "home":
     <div class="center">
         <p class="title">ayo cek tanamanmu!</p>
         <p class="subtitle">kenali soybean rust sejak dini<br>untuk hasil panen yang lebih baik</p>
-        <div style="text-align: center;">
-            <button class="stButton">
-                <a href="#" onclick="parent.postMessage({target: 'streamlit_rerun', data: {page: 'deteksi'}}, '*'); return false;">cek disini</a>
-            </button>
-        </div>
     </div>
     """, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
     
-    # Menangani klik tombol di landing page
     if st.button("cek disini", key="home_button"):
         st.session_state.page = "deteksi"
         st.rerun()
@@ -256,7 +214,6 @@ if st.session_state.page == "home":
 # Halaman Deteksi (CNN & YOLO)
 # ====================
 elif st.session_state.page == "deteksi":
-    show_header()
     st.markdown("## 🌱 Deteksi Penyakit Soybean Rust (CNN vs YOLO)", unsafe_allow_html=True)
     st.markdown("""<div class="detection-container">""", unsafe_allow_html=True)
 
