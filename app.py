@@ -4,9 +4,10 @@ from PIL import Image
 import os
 import tensorflow as tf
 from ultralytics import YOLO
+import gdown
 
 # ====================
-# CSS Styling dengan URL daun online
+# CSS Styling
 # ====================
 st.markdown("""
     <style>
@@ -47,8 +48,6 @@ st.markdown("""
             background-color: #4b8b64;
             color: white;
         }
-
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -59,7 +58,6 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 if st.session_state.page == "home":
-    # Landing page
     st.markdown("""
     <div class="center">
         <p class="title">ayo cek tanamanmu!</p>
@@ -72,19 +70,23 @@ if st.session_state.page == "home":
         st.experimental_rerun()
 
 # ====================
-# Halaman Deteksi (CNN & YOLO)
+# Halaman Deteksi
 # ====================
 elif st.session_state.page == "deteksi":
-
     st.title("Perbandingan Deteksi Penyakit Soybean Rust (CNN vs YOLO) 🌱")
     st.write("Unggah satu gambar daun kedelai untuk melihat hasil deteksi dari kedua model secara bersamaan.")
 
+    # ===== Load CNN model =====
     @st.cache_resource
     def load_cnn_model():
         MODEL_PATH = "models/cnn_soybean_rust.h5"
+        DRIVE_URL = "https://drive.google.com/file/d/1JeSvrid8Zw2xurG-pciDrw6EdI2qXuAd/view?usp=sharing"  
+
         if not os.path.exists(MODEL_PATH):
-            st.error(f"File model CNN tidak ditemukan: {MODEL_PATH}")
-            return None
+            os.makedirs("models", exist_ok=True)
+            st.info("Mengunduh model CNN dari Google Drive...")
+            gdown.download(DRIVE_URL, MODEL_PATH, quiet=False)
+
         try:
             model = tf.keras.models.load_model(MODEL_PATH)
             return model
@@ -92,6 +94,7 @@ elif st.session_state.page == "deteksi":
             st.error(f"Gagal memuat model CNN: {e}")
             return None
 
+    # ===== Load YOLO model =====
     @st.cache_resource
     def load_yolo_model():
         MODEL_PATH = "models/best.pt"
@@ -105,7 +108,6 @@ elif st.session_state.page == "deteksi":
             st.error(f"Gagal memuat model YOLOv8: {e}")
             return None
 
-    # Muat model
     cnn_model = load_cnn_model()
     yolo_model = load_yolo_model()
 
