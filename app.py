@@ -109,7 +109,7 @@ elif st.session_state.page == "deteksi":
     def load_cnn_model():
         # --- Unduh model dari Google Drive ---
         GOOGLE_DRIVE_FILE_ID = "1b_FSjLnr66yv9WjEz9Sxo6ztr7QW1kvz" # Link sudah disesuaikan
-        MODEL_PATH = "models/cnn_soybean_rust.h5"
+        MODEL_PATH = "models/cnn.h5"
         
         # Periksa apakah folder "models" ada, jika tidak, buatlah
         os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
