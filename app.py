@@ -171,7 +171,7 @@ elif st.session_state.page == "deteksi":
                 class_id = np.argmax(prediction)
                 confidence = np.max(prediction)
                 
-                class_names = ["Daun Sehat", "Soybean Rust"]
+                class_names = ["sehat", "Soybean Rust"]
                 predicted_class_name = class_names[class_id]
 
                 st.write(f"### Prediksi: **{predicted_class_name}**")
