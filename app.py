@@ -15,47 +15,19 @@ st.markdown("""
             background-color: light gray;
         }
 
-        /* Daun kiri atas */
-        body::before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            left: -50px;
-            width: 250px;
-            height: 250px;
-            background: url("https://i.ibb.co/Lh2W1tV/leaf-top.png") no-repeat;
-            background-size: contain;
-            transform: rotate(20deg);
-            z-index: -1;
-        }
-
-        /* Daun kanan bawah */
-        body::after {
-            content: "";
-            position: absolute;
-            bottom: -30px;
-            right: -50px;
-            width: 250px;
-            height: 250px;
-            background: url("https://i.ibb.co/Z2ShYDC/leaf-bottom.png") no-repeat;
-            background-size: contain;
-            transform: rotate(-15deg);
-            z-index: -1;
-        }
-
         .center {
             text-align: center;
             padding-top: 120px;
         }
 
         .title {
-            font-size: 36px;
+            font-size: 45px;
             font-weight: 700;
             color: #4b8b64;
         }
 
         .subtitle {
-            font-size: 16px;
+            font-size: 23px;
             font-style: italic;
             color: #7d7d7d;
             margin-top: -10px;
