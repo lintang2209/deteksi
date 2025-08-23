@@ -75,6 +75,14 @@ st.markdown("""
             background-color: #4b8b64;
             color: white;
         }
+
+        /* CSS baru untuk memusatkan tombol */
+        .center-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -93,9 +101,13 @@ if st.session_state.page == "home":
     </div>
     """, unsafe_allow_html=True)
 
+    # Bungkus tombol dengan container dan CSS
+    st.markdown('<div class="center-button">', unsafe_allow_html=True)
     if st.button("cek disini"):
         st.session_state.page = "deteksi"
         st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ====================
 # Halaman Deteksi (CNN & YOLO)
