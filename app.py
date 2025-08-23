@@ -9,12 +9,13 @@ import gdown
 # ====================
 # CSS Styling (Landing Page & Dashboard)
 # ====================
+
 st.markdown("""
     <style>
         /* Atur background halaman */
         .main {
             background-color: #f9fdf9;
-            color: #333333; /* Default warna teks biar tidak putih */
+            color: #555555; /* default teks abu-abu sama dengan landing */
         }
 
         /* Center konten di landing page */
@@ -27,13 +28,13 @@ st.markdown("""
         .title {
             font-size: 40px;
             font-weight: 700;
-            color: #4b8b64;
+            color: #4b8b64; /* hijau daun */
         }
 
         .subtitle {
             font-size: 18px;
             font-style: italic;
-            color: #555555;
+            color: #555555; /* abu lembut */
             margin-top: -10px;
         }
 
@@ -59,7 +60,7 @@ st.markdown("""
             padding: 30px;
             border-radius: 15px;
             text-align: center;
-            color: #333333;
+            color: #555555; /* teks dalam box abu */
         }
 
         /* Card hasil deteksi */
@@ -69,12 +70,12 @@ st.markdown("""
             padding: 20px;
             box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            color: #333333; /* pastikan teks dalam card tidak putih */
+            color: #555555; /* teks abu */
         }
         .result-title {
             font-weight: bold;
             font-size: 16px;
-            color: #4b8b64;
+            color: #4b8b64; /* judul card tetap hijau */
         }
         .result-pred {
             color: red;
