@@ -7,12 +7,40 @@ from ultralytics import YOLO
 import gdown
 
 # ====================
-# CSS Styling
+# CSS Styling dengan URL daun online
 # ====================
 st.markdown("""
     <style>
         .main {
-            background-color: #6666
+            background-color: #f9fafb;
+        }
+
+        /* Daun kiri atas */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -30px;
+            left: -50px;
+            width: 250px;
+            height: 250px;
+            background: url("https://i.ibb.co/Lh2W1tV/leaf-top.png") no-repeat;
+            background-size: contain;
+            transform: rotate(20deg);
+            z-index: -1;
+        }
+
+        /* Daun kanan bawah */
+        body::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            right: -50px;
+            width: 250px;
+            height: 250px;
+            background: url("https://i.ibb.co/Z2ShYDC/leaf-bottom.png") no-repeat;
+            background-size: contain;
+            transform: rotate(-15deg);
+            z-index: -1;
         }
 
         .center {
@@ -23,7 +51,7 @@ st.markdown("""
         .title {
             font-size: 36px;
             font-weight: 700;
-            color: #7d7d7d;
+            color: #4b8b64;
         }
 
         .subtitle {
@@ -42,7 +70,6 @@ st.markdown("""
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
-            position:center;
         }
         .stButton>button:hover {
             background-color: #4b8b64;
@@ -58,6 +85,7 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 if st.session_state.page == "home":
+    # Landing page
     st.markdown("""
     <div class="center">
         <p class="title">ayo cek tanamanmu!</p>
@@ -67,26 +95,35 @@ if st.session_state.page == "home":
 
     if st.button("cek disini"):
         st.session_state.page = "deteksi"
-        st.experimental_rerun()
+        st.rerun()
 
 # ====================
-# Halaman Deteksi
+# Halaman Deteksi (CNN & YOLO)
 # ====================
 elif st.session_state.page == "deteksi":
+
     st.title("Perbandingan Deteksi Penyakit Soybean Rust (CNN vs YOLO) 🌱")
     st.write("Unggah satu gambar daun kedelai untuk melihat hasil deteksi dari kedua model secara bersamaan.")
 
-    # ===== Load CNN model =====
     @st.cache_resource
     def load_cnn_model():
-        #MODEL_PATH = "models/cnn_soybean_rust.h5"
-        DRIVE_URL = "https://drive.google.com/file/d/1JeSvrid8Zw2xurG-pciDrw6EdI2qXuAd/view?usp=sharing"  
+        # --- Unduh model dari Google Drive ---
+        GOOGLE_DRIVE_FILE_ID = "1JeSvrid8Zw2xurG-pciDrw6EdI2qXuAd"
+        MODEL_PATH = "models/cnn_soybean_rust.h5"
+        
+        # Periksa apakah folder "models" ada, jika tidak, buatlah
+        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 
         if not os.path.exists(MODEL_PATH):
-            os.makedirs("models", exist_ok=True)
-            st.info("Mengunduh model CNN dari Google Drive...")
-            gdown.download(DRIVE_URL, MODEL_PATH, quiet=False)
+            st.info("Mengunduh model dari Google Drive...")
+            try:
+                gdown.download(f'https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}', MODEL_PATH, quiet=False)
+                st.success("Model berhasil diunduh!")
+            except Exception as e:
+                st.error(f"Gagal mengunduh model dari Google Drive: {e}")
+                return None
 
+        # --- Muat model ---
         try:
             model = tf.keras.models.load_model(MODEL_PATH)
             return model
@@ -94,7 +131,6 @@ elif st.session_state.page == "deteksi":
             st.error(f"Gagal memuat model CNN: {e}")
             return None
 
-    # ===== Load YOLO model =====
     @st.cache_resource
     def load_yolo_model():
         MODEL_PATH = "models/best.pt"
@@ -108,6 +144,7 @@ elif st.session_state.page == "deteksi":
             st.error(f"Gagal memuat model YOLOv8: {e}")
             return None
 
+    # Muat model
     cnn_model = load_cnn_model()
     yolo_model = load_yolo_model()
 
@@ -162,4 +199,4 @@ elif st.session_state.page == "deteksi":
 
     if st.button("⬅️ Kembali ke Beranda"):
         st.session_state.page = "home"
-        st.experimental_rerun()
+        st.rerun()
